@@ -91,17 +91,3 @@ release:
     ---
 
     **Full Changelog**: https://github.com/michaelahli/s3-mirror/compare/{{.PreviousTag}}...{{.Tag}}
-
-# Homebrew tap (optional - for macOS users)
-brews:
-  - name: s3-mirror
-    repository:
-      owner: michaelahli
-      name: homebrew-tap
-    directory: Formula
-    homepage: https://github.com/michaelahli/s3-mirror
-    description: High-performance S3 and MinIO bucket mirroring tool
-    license: MIT
-    skip_upload: auto
-    install: |
-      bin.install "s3-mirror"
