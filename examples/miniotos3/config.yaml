@@ -1,0 +1,17 @@
+# MinIO to S3 Configuration Example (Hybrid)
+source:
+  type: minio
+  bucket: minio-bucket
+  endpoint: localhost:9000
+  access_key_id: minioadmin
+  secret_access_key: minioadmin
+  use_ssl: false
+
+target:
+  type: s3
+  bucket: aws-archive
+  region: us-east-1
+
+workers: 10
+dry_run: false
+verbose: false

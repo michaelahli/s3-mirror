@@ -1,0 +1,16 @@
+# S3 to S3 Configuration Example
+source:
+  type: s3
+  bucket: my-source-bucket
+  region: us-east-1
+  prefix: "data/" # Optional: only mirror objects with this prefix
+
+target:
+  type: s3
+  bucket: my-target-bucket
+  region: us-west-2
+  prefix: "backup/" # Optional: add this prefix to all copied objects
+
+workers: 20
+dry_run: false
+verbose: true

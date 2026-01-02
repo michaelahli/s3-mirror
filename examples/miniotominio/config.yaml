@@ -1,0 +1,22 @@
+# MinIO to MinIO Configuration Example
+source:
+  type: minio
+  bucket: source-bucket
+  endpoint: minio1.example.com:9000
+  access_key_id: minioadmin
+  secret_access_key: minioadmin
+  use_ssl: false
+  prefix: ""
+
+target:
+  type: minio
+  bucket: target-bucket
+  endpoint: minio2.example.com:9000
+  access_key_id: minioadmin
+  secret_access_key: minioadmin
+  use_ssl: false
+  prefix: ""
+
+workers: 10
+dry_run: false
+verbose: false
