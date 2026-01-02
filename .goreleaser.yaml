@@ -1,0 +1,142 @@
+# GoReleaser configuration
+# Run: goreleaser release --clean
+# Or with GitHub Actions: automatic on git tag push
+
+version: 2
+
+before:
+  hooks:
+    # Run tests before building
+    - go test ./...
+    - go mod tidy
+
+builds:
+  - id: s3-mirror
+    main: ./cmd/s3-mirror
+    binary: s3-mirror
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+      - arm
+    goarm:
+      - "7"
+    # Ignore combinations that don't make sense
+    ignore:
+      - goos: windows
+        goarch: arm
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - id: s3-mirror
+    format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - LICENSE
+      - config.yaml.example
+
+checksum:
+  name_template: "checksums.txt"
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "^ci:"
+
+release:
+  github:
+    owner: michaelahli
+    name: s3-mirror
+  draft: false
+  prerelease: auto
+  name_template: "{{.ProjectName}} v{{.Version}}"
+  header: |
+    ## S3 Bucket Mirror {{.Version}}
+
+    A high-performance tool for mirroring files between S3 and MinIO buckets.
+
+    ### Installation
+
+    Download the appropriate binary for your platform below.
+
+  footer: |
+    ---
+
+    **Full Changelog**: https://github.com/michaelahli/s3-mirror/compare/{{.PreviousTag}}...{{.Tag}}
+
+# Homebrew tap (optional - for macOS users)
+brews:
+  - name: s3-mirror
+    repository:
+      owner: michaelahli
+      name: homebrew-tap
+    folder: Formula
+    homepage: https://github.com/michaelahli/s3-mirror
+    description: High-performance S3 and MinIO bucket mirroring tool
+    license: MIT
+    skip_upload: auto
+    install: |
+      bin.install "s3-mirror"
+
+# Docker images (optional)
+dockers:
+  - image_templates:
+      - "michaelahli/s3-mirror:{{ .Version }}-amd64"
+      - "michaelahli/s3-mirror:latest-amd64"
+    use: buildx
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+  - image_templates:
+      - "michaelahli/s3-mirror:{{ .Version }}-arm64"
+      - "michaelahli/s3-mirror:latest-arm64"
+    use: buildx
+    goarch: arm64
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+
+docker_manifests:
+  - name_template: "michaelahli/s3-mirror:{{ .Version }}"
+    image_templates:
+      - "michaelahli/s3-mirror:{{ .Version }}-amd64"
+      - "michaelahli/s3-mirror:{{ .Version }}-arm64"
+  - name_template: "michaelahli/s3-mirror:latest"
+    image_templates:
+      - "michaelahli/s3-mirror:latest-amd64"
+      - "michaelahli/s3-mirror:latest-arm64"
