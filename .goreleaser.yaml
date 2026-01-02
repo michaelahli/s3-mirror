@@ -105,37 +105,3 @@ brews:
     skip_upload: auto
     install: |
       bin.install "s3-mirror"
-
-# Docker images (optional)
-dockers:
-  - image_templates:
-      - "michaelahli/s3-mirror:{{ .Version }}-amd64"
-      - "michaelahli/s3-mirror:latest-amd64"
-    use: buildx
-    dockerfile: Dockerfile
-    build_flag_templates:
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-  - image_templates:
-      - "michaelahli/s3-mirror:{{ .Version }}-arm64"
-      - "michaelahli/s3-mirror:latest-arm64"
-    use: buildx
-    goarch: arm64
-    dockerfile: Dockerfile
-    build_flag_templates:
-      - "--platform=linux/arm64"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-
-docker_manifests:
-  - name_template: "michaelahli/s3-mirror:{{ .Version }}"
-    image_templates:
-      - "michaelahli/s3-mirror:{{ .Version }}-amd64"
-      - "michaelahli/s3-mirror:{{ .Version }}-arm64"
-  - name_template: "michaelahli/s3-mirror:latest"
-    image_templates:
-      - "michaelahli/s3-mirror:latest-amd64"
-      - "michaelahli/s3-mirror:latest-arm64"
