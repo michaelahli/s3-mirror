@@ -99,7 +99,7 @@ brews:
     repository:
       owner: michaelahli
       name: homebrew-tap
-    folder: Formula
+    directory: Formula
     homepage: https://github.com/michaelahli/s3-mirror
     description: High-performance S3 and MinIO bucket mirroring tool
     license: MIT
